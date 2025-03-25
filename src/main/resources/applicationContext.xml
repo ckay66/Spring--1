@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!-- bean标签 用于配置交由spring容器管理的对象 每个bean代表一个交由管理的对象 -->
+    <!-- id:实例对象的名字 可以自己定义   class:实例对象全路径 -->
+    <!-- spring底层就是通过反射 基于class对象进行对象的创建以及处理   -->
+    <!-- cope="singleton"用于配置对象的范围 默认单利 无论获取多少次都返回唯一对象 对象会在spring容器创建时创建   -->
+    <bean id="userService" class="org.example.service.impl.UserServiceImpl" scope="singleton"></bean>
+    <!-- scope="prototype" 将对象配置为多例时 会在调用getBean方法时创建新的对象返回   -->
+    <bean id="u2" class="org.example.service.impl.UserServiceImpl" scope="prototype"></bean>
+
+    <!-- 对于交由spring管理的单例对象而言 对象的生命周期是随着spring容器的启动而创建 spring容器的关闭而销毁
+     通过配置init-method="a" destroy-method="b" 可以在对应的时机自动调用对应的方法实现功能
+     -->
+    <bean id="u3" class="org.example.service.impl.UserServiceImpl" init-method="a" destroy-method="b"></bean>
+</beans>
