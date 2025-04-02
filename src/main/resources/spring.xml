@@ -1,0 +1,44 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+    <bean id="u1" class="org.example.d.User">
+        <property name="id" value="1"/>
+        <property name="name" value="张三"/>
+        <property name="age" value="18"/>
+    </bean>
+    <!-- 我们已经在spring中配置c3p0与druid连接池 但是配置的参数相同
+    如果修改需要依次修改 在实际开发中应该统一配置 我们一般会将数据库的参数
+    书写在jdbc.properties中 使用时 通过读取配置文件进行配置 而不是直接书写
+    spring也提供了类似mybatis读取properties配置文件的流程
+    -->
+    <!-- 1.书写头文件
+        因为spring配置功能比较多 所以可以理解为将spring的头文件按照功能进行了拆分
+        这样使用什么功能就书写对应的头文件
+        注意:有些头文件是由spring基础jar包提供的 有些头文件需要额外导入jar包才能使用
+    -->
+    <!-- 2.读取指定位置的properties配置文件   -->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <!-- 3.通过${name}的形式进行使用 注意:name尽量书写前缀
+     因为spring与idea环境整合提供提示功能的前提下会获取环境数据
+     ${username}获取的是当前计算机登录用户名称
+     -->
+
+    <!-- 在spring中配置数据源对象 -->
+    <bean id="c3p0" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+    <bean id="druid" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+</beans>

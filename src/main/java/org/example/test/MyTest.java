@@ -1,62 +1,118 @@
 package org.example.test;
 
-import org.example.service.UserService;
+import com.alibaba.druid.pool.DruidDataSource;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ResourceBundle;
 
 public class MyTest {
     @Test
-    public void live() {
-        ClassPathXmlApplicationContext applicationContext = new
-                ClassPathXmlApplicationContext("applicationContext.xml");
-
+    public void druidSpring() throws SQLException {
+        ClassPathXmlApplicationContext applicationContext=new ClassPathXmlApplicationContext("spring.xml");
+        DruidDataSource druid = (DruidDataSource) applicationContext.getBean("druid");
+        Connection connection = druid.getConnection();
+        System.out.println(connection);
+        connection.close();
         applicationContext.close();
+    }
+    @Test
+    public void c3p0Spring() throws SQLException {
+        ClassPathXmlApplicationContext applicationContext=new ClassPathXmlApplicationContext("spring.xml");
+        ComboPooledDataSource c3p0 = (ComboPooledDataSource) applicationContext.getBean("c3p0");
+        Connection connection = c3p0.getConnection();
+        System.out.println(connection);
+        connection.close();
+        applicationContext.close();
+    }
+    @Test
+    public void druidTest() throws Exception {
+        //我们已经手动配置; c3p0与druid连接池 但是配置的参数相同
+        //如果修改需要依次修改 在实际开发中应该统一配置 我们一般会将数据库的参数
+        //书写在jdbc.properties中 使用时 通过读取配置文件进行配置 而不是直接书写
+        //java中提供了各种读取properties的工具类
+        //ResourceBundle自动读取类路径下指定名称的properties配置文件
+        ResourceBundle rb = ResourceBundle.getBundle("jdbc");
+
+        //使用无参构造方法创建数据源对象
+        DruidDataSource druid=new DruidDataSource();
+        //使用setter方法设置连接属性
+        druid.setDriverClassName(rb.getString("jdbc.driver"));
+        druid.setUrl(rb.getString("jdbc.url"));
+        druid.setUsername(rb.getString("jdbc.username"));
+        druid.setPassword(rb.getString("jdbc.password"));
+        //使用数据源获取连接对象
+        Connection connection = druid.getConnection();
+        System.out.println(connection);
+        //归还连接 关闭连接池
+        connection.close();
+        druid.close();
+    }
+    @Test
+    public void c3p0Test() throws Exception {
+        //我们已经手动配置; c3p0与druid连接池 但是配置的参数相同
+        //如果修改需要依次修改 在实际开发中应该统一配置 我们一般会将数据库的参数
+        //书写在jdbc.properties中 使用时 通过读取配置文件进行配置 而不是直接书写
+        //java中提供了各种读取properties的工具类
+        //ResourceBundle自动读取类路径下指定名称的properties配置文件
+        ResourceBundle rb = ResourceBundle.getBundle("jdbc");
+
+        //使用无参构造方法创建数据源对象
+        ComboPooledDataSource c3p0=new ComboPooledDataSource();
+        //使用setter方法设置连接属性
+        c3p0.setDriverClass(rb.getString("jdbc.driver"));
+        c3p0.setJdbcUrl(rb.getString("jdbc.url"));
+        c3p0.setUser(rb.getString("jdbc.username"));
+        c3p0.setPassword(rb.getString("jdbc.password"));
+        //使用数据源获取连接对象
+        Connection connection = c3p0.getConnection();
+        System.out.println(connection);
+        //归还连接 关闭连接池
+        connection.close();
+        c3p0.close();
+    }
+    @Test
+    public void druid() throws Exception {
+        //使用无参构造方法创建数据源对象
+        DruidDataSource druid=new DruidDataSource();
+        //使用setter方法设置连接属性
+        druid.setDriverClassName("com.mysql.jdbc.Driver");
+        druid.setUrl("jdbc:mysql:///test");
+        druid.setUsername("root");
+        druid.setPassword("123456");
+        //使用数据源获取连接对象
+        Connection connection = druid.getConnection();
+        System.out.println(connection);
+        //归还连接 关闭连接池
+        connection.close();
+        druid.close();
+    }
+    @Test
+    public void c3p0() throws Exception {
+        //使用无参构造方法创建数据源对象
+        ComboPooledDataSource c3p0=new ComboPooledDataSource();
+        //使用setter方法设置连接属性
+        c3p0.setDriverClass("com.mysql.jdbc.Driver");
+        c3p0.setJdbcUrl("jdbc:mysql:///test");
+        c3p0.setUser("root");
+        c3p0.setPassword("123456");
+        //使用数据源获取连接对象
+        Connection connection = c3p0.getConnection();
+        System.out.println(connection);
+        //归还连接 关闭连接池
+        connection.close();
+        c3p0.close();
     }
 
     @Test
-    public void scope2() {
-        ClassPathXmlApplicationContext applicationContext = new
-                ClassPathXmlApplicationContext("applicationContext.xml");
-        UserService u1 = (UserService) applicationContext.getBean("u2");
-        UserService u2 = (UserService) applicationContext.getBean("u2");
-        System.out.println(u1 == u2);
-        System.out.println(u1.hashCode() + "|" + u2.hashCode());
+    public void u1(){
+        ClassPathXmlApplicationContext applicationContext=new ClassPathXmlApplicationContext("spring.xml");
+        Object u1 = applicationContext.getBean("u1");
+        System.out.println(u1);
         applicationContext.close();
     }
 
-    @Test
-    public void scope1() {
-        ClassPathXmlApplicationContext applicationContext = new
-                ClassPathXmlApplicationContext("applicationContext.xml");
-        UserService u1 = (UserService) applicationContext.getBean("userService");
-        UserService u2 = (UserService) applicationContext.getBean("userService");
-        System.out.println(u1 == u2);
-        System.out.println(u1.hashCode() + "|" + u2.hashCode());
-        applicationContext.close();
-    }
-
-
-    @Test
-    public void test() {
-        //1.加载配置 创建容器对象 ApplicationContext代表容器对象接口
-        //1)ClassPathXmlApplicationContext 加载类路径(resource)下xml配置文件 创建spring容器对象(常用)
-        //2)FileSystemXmlApplicationContext 加载文件系统下xml配置文件 创建spring容器对象
-        //3)AnnotationConfigApplicationContext 加载注解配置类 创建spring容器对象
-        ClassPathXmlApplicationContext applicationContext = new
-                ClassPathXmlApplicationContext("applicationContext.xml");
-
-        //2.调用getBean方法获取指定对象
-        //1)getBean(String id) 根据配置的id进行对象的获取 因为spring中可以存储各种类型的对象 所以该方法返回Object对象 使用前需要强转
-        UserService u1 = (UserService) applicationContext.getBean("userService");
-        //2)getBean(Class c) 通过类型进行匹配 注意:如果在配置中存在多个相同class会报错
-        UserService u2 = applicationContext.getBean(UserService.class);
-
-        //3.使用
-        u1.save();
-        u2.save();
-
-        //4.每个spring容器创建方式创建的spring容器拥有额外的close方法用于关闭容器
-        applicationContext.close();
-    }
 }
