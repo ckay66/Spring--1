@@ -1,0 +1,27 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="target" class="org.example.aop.Target"></bean>
+    <bean id="myAspect" class="org.example.aop.MyAspect"></bean>
+
+    <aop:config>
+        <aop:pointcut id="select" expression="execution(void org.example.aop.Target.select*(..))"/>
+        <aop:pointcut id="add" expression="execution(* org.example.aop.Target.add(..))"/>
+        <aop:aspect ref="myAspect">
+            <aop:before method="before" pointcut-ref="select"/>
+            <aop:after method="after" pointcut-ref="select"/>
+            <aop:around method="around" pointcut-ref="add"/>
+            <aop:after-throwing method="afterThrowing" throwing="e" pointcut-ref="add"/>
+            <aop:after-returning method="afterReturning" returning="result" pointcut-ref="add"/>
+        </aop:aspect>
+    </aop:config>
+</beans>

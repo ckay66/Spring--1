@@ -1,0 +1,25 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!-- springAOP基于springIOC所以springAOP的注解开发也基于springIOC的注解开发
+    开启组件扫描 才能将目标对象与切面对象交由spring容器进行管理 为后续额外功能的配置做准备
+    -->
+    <context:component-scan base-package="org.example"/>
+
+    <!-- 开启springAOP的切面自动代理
+     springAOP底层就是使用代理对象的形式实现功能的增强 原本是通过手动配置的形式实现代理操作
+     使用该配置之后 会在交由spring容器管理的对象中继续进行注解的扫描 进行代理的自动配置
+     等价于<aop:config>
+     默认使用jdk代理生成代理对象 如果目标对象没有实现接口则使用cglib生成代理对象
+     如果设置proxy-target-class="true" 代表强制使用cglib代理生成代理对象
+     -->
+    <aop:aspectj-autoproxy />
+</beans>
